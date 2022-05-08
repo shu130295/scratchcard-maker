@@ -1,5 +1,5 @@
-import { Label, Link, PrimaryButton, TextField } from '@fluentui/react';
-import axios from 'axios';
+import { Label, Link, PrimaryButton, Spinner, TextField } from '@fluentui/react';
+import axios, { AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import './App.css';
 
@@ -8,12 +8,25 @@ function App() {
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [hasError, setHasError] = useState<boolean>(false);
     const [link, setLink] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
 
     const submit = async (content: string) => {
         setSubmitted(true);
-        await axios.post('/api/Scratchcard',{})
-        setLink('https://www.google.com');
+        setLoading(true);
+        setLink('');
         setHasError(false);
+        setContent('');
+        const url = 'https://scratchcard.azurewebsites.net/api/scratchcard';
+        try {
+            const response: AxiosResponse = await axios.post(url,{ content: content });
+            setLink('https://scratchcard.netlify.app?id=' + response.data.id);
+            setContent('');
+        } catch {
+            setLink('');
+            setHasError(false);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -23,12 +36,13 @@ function App() {
                     <TextField
                         placeholder={content} 
                         multiline 
+                        value={content}
                         autoAdjustHeight 
                         onChange={(ev, newText) => { setContent(newText!) }} 
                         label='Enter the html in this box'/>
                 </div>
                 <div className='button'>
-                    <PrimaryButton width={500} text='Submit' onClick={() => submit(content)}/>
+                    <PrimaryButton width={500} text='Submit' onClick={() => submit(content)} disabled={loading}/>
                 </div>
             </div>
             { !submitted && 
@@ -37,8 +51,9 @@ function App() {
                     <div className='displaybox' dangerouslySetInnerHTML={{ __html: content }} />
                 </div>
             }
-            { submitted && hasError && <Link href={link} target='_blank' underline>{link}</Link>}
-            { submitted && !hasError && <p className='error'>An error has occurred</p>}
+            { loading && <Spinner />}
+            { submitted && !hasError && <Link href={link} target='_blank' underline>{link}</Link>}
+            { submitted && hasError && <p className='error'>An error has occurred</p>}
         </div>
     );
 }
