@@ -7,7 +7,7 @@
 
 .content {
     width: min(90vw, 500px);
-    margin-bottom: 10vh;
+    margin-bottom: 2vh;
     display: flex;
     flex-direction: column;
 }
