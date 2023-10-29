@@ -44,6 +44,8 @@ function App() {
                 <div className='button'>
                     <PrimaryButton width={500} text='Submit' onClick={() => submit(content)} disabled={loading}/>
                 </div>
+                <br/>
+                <p><b>Tip: </b>For images, use 400 px x 400 px size. Convert it to base64. Then do - &lt;img src="..."/&gt; </p>
             </div>
             { !submitted && 
                 <div>
